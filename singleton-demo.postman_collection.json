@@ -1,0 +1,224 @@
+{
+  "info": {
+    "name": "Singleton Demo",
+    "description": "Verifies that each Singleton variant exposed by the singleton-demo Spring Boot app returns the same instance (same instanceId / hashCode) across repeated calls.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "doubleCheckedLockingInstanceId",
+      "value": ""
+    },
+    {
+      "key": "enumInstanceId",
+      "value": ""
+    },
+    {
+      "key": "billPughInstanceId",
+      "value": ""
+    },
+    {
+      "key": "springInstanceId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Singleton Verification",
+      "item": [
+        {
+          "name": "Double-Checked Locking - Call 1",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/singleton/double-checked-locking"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('doubleCheckedLockingInstanceId', body.instanceId + ':' + body.instanceHashCode);",
+                  "pm.test('instanceId and hashCode are present', () => {",
+                  "  pm.expect(body.instanceId).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.instanceHashCode).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Double-Checked Locking - Call 2",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/singleton/double-checked-locking"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('same instance as first call', () => {",
+                  "  const current = body.instanceId + ':' + body.instanceHashCode;",
+                  "  pm.expect(current).to.eql(pm.collectionVariables.get('doubleCheckedLockingInstanceId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Enum - Call 1",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/singleton/enum"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('enumInstanceId', body.instanceId + ':' + body.instanceHashCode);",
+                  "pm.test('instanceId and hashCode are present', () => {",
+                  "  pm.expect(body.instanceId).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.instanceHashCode).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Enum - Call 2",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/singleton/enum"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('same instance as first call', () => {",
+                  "  const current = body.instanceId + ':' + body.instanceHashCode;",
+                  "  pm.expect(current).to.eql(pm.collectionVariables.get('enumInstanceId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bill Pugh (static holder) - Call 1",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/singleton/bill-pugh"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('billPughInstanceId', body.instanceId + ':' + body.instanceHashCode);",
+                  "pm.test('instanceId and hashCode are present', () => {",
+                  "  pm.expect(body.instanceId).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.instanceHashCode).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bill Pugh (static holder) - Call 2",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/singleton/bill-pugh"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('same instance as first call', () => {",
+                  "  const current = body.instanceId + ':' + body.instanceHashCode;",
+                  "  pm.expect(current).to.eql(pm.collectionVariables.get('billPughInstanceId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Spring-managed - Call 1",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/singleton/spring"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('springInstanceId', body.instanceId + ':' + body.instanceHashCode);",
+                  "pm.test('instanceId and hashCode are present', () => {",
+                  "  pm.expect(body.instanceId).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.instanceHashCode).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Spring-managed - Call 2",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/singleton/spring"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('same instance as first call', () => {",
+                  "  const current = body.instanceId + ':' + body.instanceHashCode;",
+                  "  pm.expect(current).to.eql(pm.collectionVariables.get('springInstanceId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
