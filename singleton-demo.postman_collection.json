@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Singleton Demo",
-    "description": "Verifies that each Singleton variant exposed by the singleton-demo Spring Boot app returns the same instance (same instanceId / hashCode) across repeated calls.",
+    "name": "Design Patterns Demo",
+    "description": "Verifies the design pattern demos in the design-patterns Spring Boot app: Singleton (same instance across repeated calls) and Factory Method (correct concrete sender resolved per channel, invalid channel rejected).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -212,6 +212,144 @@
                   "pm.test('same instance as first call', () => {",
                   "  const current = body.instanceId + ':' + body.instanceHashCode;",
                   "  pm.expect(current).to.eql(pm.collectionVariables.get('springInstanceId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Factory Method Verification",
+      "item": [
+        {
+          "name": "Email channel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/email/send",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"recipient\":\"user@example.com\",\"message\":\"Hello via email\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('resolved to EmailNotificationSender', () => {",
+                  "  pm.expect(body.channel).to.eql('email');",
+                  "  pm.expect(body.handledBy).to.eql('EmailNotificationSender');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SMS channel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/sms/send",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"recipient\":\"+15551234567\",\"message\":\"Hello via sms\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('resolved to SmsNotificationSender', () => {",
+                  "  pm.expect(body.channel).to.eql('sms');",
+                  "  pm.expect(body.handledBy).to.eql('SmsNotificationSender');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Push channel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/push/send",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"recipient\":\"device-token-123\",\"message\":\"Hello via push\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('resolved to PushNotificationSender', () => {",
+                  "  pm.expect(body.channel).to.eql('push');",
+                  "  pm.expect(body.handledBy).to.eql('PushNotificationSender');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid channel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/carrier-pigeon/send",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"recipient\":\"user@example.com\",\"message\":\"Hello via carrier pigeon\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is a client error (4xx)', () => {",
+                  "  pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "pm.test('error body explains the unknown channel', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.error).to.be.a('string').and.not.empty;",
                   "});"
                 ]
               }
